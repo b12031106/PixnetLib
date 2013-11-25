@@ -8,6 +8,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
     const PIXNET_REFRESH_TOKEN_KEY = 'pixnet_refresh_token';
     const PIXNET_LAST_REFRESHED_AT_KEY = 'pixnet_last_refreshed_at';
     const PIXNET_USERNAME_KEY = 'pixnet_username';
+    const PIXNET_REDIRECT_TO_KEY = 'pixnet_redirect_to';
     const PIXNET_API_ROOT = 'https://emma.pixnet.cc';
     const TOKEN_TIMEOUT_LIMIT = 3000; // Service setting is 3600, we refresh it early
 
@@ -35,7 +36,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
 
     static public function getAuthorizeUrl($redirect_uri = '') {
       $client = self::_get_client();
-      $_SESSION[PIXNET_REDIRECT_TO] = $redirect_uri;
+      $_SESSION[self::PIXNET_REDIRECT_TO] = $redirect_uri;
       $query_string = http_build_query(array(
         'redirect_uri'  => $client['CALLBACK_URL'],
         'client_id'     => $client['CONSUMER_KEY'],
