@@ -246,7 +246,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
       }
 
       //can't match any client data, will try to use the first client
-      return self::$_CLIENT_MAPINGS[0];
+      return self::$_CLIENT_MAPPINGS[0];
     }  
 
   }//end class
