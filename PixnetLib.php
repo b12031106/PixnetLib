@@ -8,6 +8,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
     const PIXNET_REFRESH_TOKEN_KEY = 'pixnet_refresh_token';
     const PIXNET_LAST_REFRESHED_AT_KEY = 'pixnet_last_refreshed_at';
     const PIXNET_USERNAME_KEY = 'pixnet_username';
+    const PIXNET_WEBSITE_KEY = 'pixnet_website';
     const PIXNET_REDIRECT_TO_KEY = 'pixnet_redirect_to';
     const PIXNET_API_ROOT = 'https://emma.pixnet.cc';
     const TOKEN_TIMEOUT_LIMIT = 3000; // Service setting is 3600, we refresh it early
@@ -24,6 +25,10 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
     //public method
 
     static public function isSignin() {
+      $client = self::_get_client();
+      if ($_SESSION[self::PIXNET_WEBSITE_KEY] && $_SESSION[self::PIXNET_WEBSITE_KEY] != $client['WEBSITE_URL']) {
+        return FALSE;
+      }
       return $_SESSION[self::PIXNET_ACCESS_TOKEN_KEY];
     }
 
@@ -145,7 +150,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
     //private method
 
     private function _refresh_token() {
-      $client = self::_get_cilent();
+      $client = self::_get_client();
       $response = self::_call_api('/oauth2/grant', array(
         'grant_type'    => 'refresh_token',
         'refresh_token' => $_SESSION[self::PIXNET_REFRESH_TOKEN_KEY],
@@ -240,7 +245,6 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
 
       foreach (self::$_CLIENT_MAPPINGS as $client) {
         if ($_FULL_URL == $client['WEBSITE_URL']) {
-          Logger::msg('match client');
           return $client;
         }
       }
