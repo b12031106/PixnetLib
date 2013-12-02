@@ -37,6 +37,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
       $_SESSION[self::PIXNET_REFRESH_TOKEN_KEY] = '';
       $_SESSION[self::PIXNET_LAST_REFRESHED_AT_KEY] = '';
       $_SESSION[self::PIXNET_USERNAME_KEY] = '';
+      $_SESSION[self::PIXNET_WEBSITE_KEY] = '';
     }
 
     static public function getAuthorizeUrl($redirect_uri = '') {
@@ -62,19 +63,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
       ));
 
       $result = json_decode($response);
-      if ($result->access_token) {
-        $_SESSION[self::PIXNET_ACCESS_TOKEN_KEY] = $result->access_token;
-        if ($result->refresh_token) {
-          $_SESSION[self::PIXNET_REFRESH_TOKEN_KEY] = $result->refresh_token;
-        }
-        $_SESSION[self::PIXNET_LAST_REFRESHED_AT_KEY] = time();
-        self::_update_username();
-        return TRUE;
-      } else {
-        self::_pixnet_error_handler($result);
-        throw new Exception("[PIXNET]get access token by code fail, unknown error.");
-        return FALSE;
-      }
+      self::_update_token($result, 'get access token by code', $client['WEBSITE_URL']);
     }
 
     static public function callApi($url, $datas) {
@@ -159,17 +148,24 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
       ));
 
       $result = json_decode($response);
-      self::_pixnet_error_handler($result);
+      self::_update_token($result, 'refresh token', $client['WEBSITE_URL']);
+    }
+
+    private function _update_token($result, $update_type = '', $website_url = '') {
       if ($result->access_token) {
         $_SESSION[self::PIXNET_ACCESS_TOKEN_KEY] = $result->access_token;
         if ($result->refresh_token) {
           $_SESSION[self::PIXNET_REFRESH_TOKEN_KEY] = $result->refresh_token;
         }
         $_SESSION[self::PIXNET_LAST_REFRESHED_AT_KEY] = time();
+        if ($website_url) {
+          $_SESSION[self::PIXNET_WEBSITE_KEY] = $website_url;
+        }
+        self::_update_username();
         return TRUE;
       } else {
         self::_pixnet_error_handler($result);
-        throw new Exception("[PIXNET]refresh token fail, unknown error.");
+        throw new Exception("[PIXNET] {$update_type} fail, unknown error.");
         return FALSE;
       }
     }
