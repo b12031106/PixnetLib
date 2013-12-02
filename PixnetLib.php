@@ -152,6 +152,7 @@ if (!defined('PIXNET_LIB_INCLUDED')) {
     }
 
     private function _update_token($result, $update_type = '', $website_url = '') {
+      self::_pixnet_error_handler($result);
       if ($result->access_token) {
         $_SESSION[self::PIXNET_ACCESS_TOKEN_KEY] = $result->access_token;
         if ($result->refresh_token) {
